@@ -1,6 +1,17 @@
 # [Codinggame Spring Challenge 2020](https://www.codingame.com/contests/spring-challenge-2020)
 - 自分なりの解答コード．
 
+## 最短経路探索の種類
+- V: 頂点数
+- E: 辺数
+
+| 使用する時                 | 名称                  | 計算量                           |
+|----------------------------|-----------------------|----------------------------------|
+| 辺の重みが全て同一の非負数 | 幅優先探索            | O(abs(E))                        |
+| 辺の重みが非負数           | ダイクストラ法        | O(V^2), O((E+V)logV), O(E+VlogV) |
+| 辺の重みに負数を含む       | ベルマン-フォード法   | O(abs(V)\*abs(E))                |
+| 全ての2点間を求める        | ワーシャル-フロイド法 | O(V^3)                           |
+
 ## References
 - [最短経路問題総特集！！！～BFSから拡張ダイクストラまで～](https://qiita.com/ageprocpp/items/cdf67e828e1b09316f6e)
 - [最短経路問題の解法まとめ](https://qiita.com/ta-ka/items/a023a11efe17ab097433)
