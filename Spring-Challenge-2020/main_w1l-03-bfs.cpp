@@ -141,9 +141,6 @@ inline int calShortestDist(P from, P to, VVI map) {
     int height = map.size();
     int width = map[0].size();
     int diffX =  from.first - (width / 2);
-    VVI fieldCenter(height, VI(width, 0)); // from が中央にある field
-    VVI fieldLeft(height, VI(width, 0)); // from が左端にある field
-    VVI fieldRight(height, VI(width, 0)); // from が右端にある field
     VVI dist(height, VI(width, 999)); // 各セルの最短距離 (訪れていないところは 999 としておく)
 
     bool loop = false;
@@ -152,20 +149,21 @@ inline int calShortestDist(P from, P to, VVI map) {
             loop = true;
 
     if (loop) {
+        VVI fieldRight(height, VI(width, 0)); // from が右端にある field
         mapTranslation(map, fieldRight, from, 'R'); // from を右端に持っていく
         P fromRight = make_pair(width - 1, from.second);
         VVI distRight = calDist(fromRight, to, fieldRight); // from を右端に持っていったときの最短経路図
         VVI tmpRight(height, VI(width, 999));// from を元に戻したときの最短経路図
-        P inverseRight = make_pair(width - 1 - from.first, from.second);
-        P rightEdge = make_pair(width - 1, from.second);
         mapUndoTranslation(distRight, tmpRight, from, 'R');
 
+        VVI fieldLeft(height, VI(width, 0)); // from が左端にある field
         mapTranslation(map, fieldLeft, from, 'L'); // from を左端に持っていく
         P fromLeft = make_pair(0, from.second);
         VVI distLeft = calDist(fromLeft, to, fieldLeft); // from を左端に持っていったときの最短経路図
         VVI tmpLeft(height, VI(width, 999)); // from を元に戻したときの最短経路図
         mapUndoTranslation(distLeft, tmpLeft, from, 'L');
 
+        VVI fieldCenter(height, VI(width, 0)); // from が中央にある field
         mapTranslation2Center(map, fieldCenter, from); // from を中央に持っていく
         P fromCenter = make_pair(from.first - diffX, from.second);
         VVI distCenter = calDist(fromCenter, to, fieldCenter); // from を中央に持っていったときの最短経路図
