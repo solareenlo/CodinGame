@@ -84,17 +84,18 @@ inline void mapTranslation(VVI &from, VVI &to, P ori, char c) {
     }
 }
 
+// from 上の両端にある ori を元の位置に戻す
 inline void mapUndoTranslation(VVI &from, VVI &to, P ori, char c) {
     int height = from.size();
     int width = from[0].size();
     // 右端を ori まで戻す
     if (c == 'R') {
-        for (int j = 0; j < width - 1 - ori.first; j++)
+        for (int j = 0; j < width - ori.first - 1; j++)
             REP(i, height)
                 to.at(i).at(j + ori.first + 1) = from.at(i).at(j);
-        for (int j = width - 1 - ori.first; j < width - 1; j++)
+        for (int j = width  - ori.first - 1; j < width; j++)
             REP(i, height)
-                to.at(i).at(j - width + 1 + ori.first) = from.at(i).at(j);
+                to.at(i).at(j - width + ori.first + 1) = from.at(i).at(j);
     }
     // 左端を ori まで戻す
     if (c == 'L') {
@@ -111,7 +112,8 @@ inline void mapUndoTranslation(VVI &from, VVI &to, P ori, char c) {
 inline void mapTranslation2Center(VVI &from, VVI &to, P ori) {
     int height = from.size();
     int width = from[0].size();
-    int diffX = diffX =  ori.first - (width / 2); // ori を中心に持っていく
+    int diffX = diffX =  ori.first - (width / 2);
+    // ori を中心に持っていく
     if (diffX <= 0) {
         for (int j = ori.first; j < width + diffX; j++)
             REP(i, height)
@@ -169,6 +171,13 @@ inline int calShortestDist(P from, P to, VVI map) {
         VVI distLeft = calDist(fromLeft, to, fieldLeft); // from を左端に持っていったときの最短経路図
         VVI tmpLeft(height, VI(width, -1)); // from を元に戻したときの最短経路図
         mapUndoTranslation(distLeft, tmpLeft, from, 'L');
+        cerr << "tmpLeft: " << height << ' ' << width << endl;
+        cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
+        REP(i, height) {
+            REP(j, width)
+                cerr << setw(2) << tmpLeft[i][j];
+            cerr << endl;
+        }
 
         mapTranslation2Center(map, fieldCenter, from); // from を中央に持っていく
         P fromCenter = make_pair(from.first - diffX, from.second);
@@ -176,13 +185,13 @@ inline int calShortestDist(P from, P to, VVI map) {
         VVI tmpCenter(height, VI(width, -1)); // from を元に戻したときの最短経路図
         P inverseCenter = make_pair(width - 1 - from.first, y);
         mapTranslation2Center(distCenter, tmpCenter, inverseCenter);
-        // cerr << "tmpCenter: " << height << ' ' << width << endl;
-        // cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
-        // REP(i, height) {
-        //     REP(j, width)
-        //         cerr << setw(2) << tmpCenter[i][j];
-        //     cerr << endl;
-        // }
+        cerr << "tmpCenter: " << height << ' ' << width << endl;
+        cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
+        REP(i, height) {
+            REP(j, width)
+                cerr << setw(2) << tmpCenter[i][j];
+            cerr << endl;
+        }
     } else {
         VVI dist = calDist(from, to, map);
         REP(i, height) {
