@@ -25,7 +25,7 @@ constexpr double INF_INT = numeric_limits<int>::infinity();
 constexpr int DX[4] = {1, 0, -1, 0};
 constexpr int DY[4] = {0, 1, 0, -1};
 
-// 幅優先探索で from から map 状の経路を作成する
+// 幅優先探索で from から map 上の経路を作成する
 inline VVI calDist(P from, P to, VVI map) {
     int height = map.size();
     int width = map[0].size();
@@ -61,7 +61,7 @@ inline VVI calDist(P from, P to, VVI map) {
     return dist;
 }
 
-// from のグリッド状の ori を右端か左端に持っていく
+// from のグリッド上の ori を右端か左端に持っていく
 inline void mapTranslation(VVI &from, VVI &to, P ori, char c) {
     int height = from.size();
     int width = from[0].size();
@@ -84,7 +84,7 @@ inline void mapTranslation(VVI &from, VVI &to, P ori, char c) {
     }
 }
 
-inline void mapUndoTranslation(VVI &from, VVI &to, P ori, char c ) {
+inline void mapUndoTranslation(VVI &from, VVI &to, P ori, char c) {
     int height = from.size();
     int width = from[0].size();
     // 右端を ori まで戻す
@@ -107,7 +107,7 @@ inline void mapUndoTranslation(VVI &from, VVI &to, P ori, char c ) {
     }
 }
 
-// from のマップ状の ori を from の中心に持っていく
+// from のマップ上の ori を from の中心に持っていく
 inline void mapTranslation2Center(VVI &from, VVI &to, P ori) {
     int height = from.size();
     int width = from[0].size();
@@ -151,30 +151,38 @@ inline int calShortestDist(P from, P to, VVI map) {
     if (loop) {
         mapTranslation(map, fieldRight, from, 'R'); // from を右端に持っていく
         P fromRight = make_pair(width - 1, from.second);
-        VVI distRight = calDist(fromRight, to, fieldRight);
-        VVI tmpRight(height, VI(width, -1));
+        VVI distRight = calDist(fromRight, to, fieldRight); // from を右端に持っていったときの最短経路図
+        VVI tmpRight(height, VI(width, -1));// from を元に戻したときの最短経路図
         P inverseRight = make_pair(width - 1 - from.first, from.second);
         P rightEdge = make_pair(width - 1, from.second);
         mapUndoTranslation(distRight, tmpRight, from, 'R');
+        cerr << "tmpRight: " << height << ' ' << width << endl;
+        cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
+        REP(i, height) {
+            REP(j, width)
+                cerr << setw(2) << tmpRight[i][j];
+            cerr << endl;
+        }
 
         mapTranslation(map, fieldLeft, from, 'L'); // from を左端に持っていく
         P fromLeft = make_pair(0, from.second);
-        VVI distLeft = calDist(fromLeft, to, fieldLeft);
-        VVI tmpLeft(height, VI(width, -1));
+        VVI distLeft = calDist(fromLeft, to, fieldLeft); // from を左端に持っていったときの最短経路図
+        VVI tmpLeft(height, VI(width, -1)); // from を元に戻したときの最短経路図
         mapUndoTranslation(distLeft, tmpLeft, from, 'L');
 
         mapTranslation2Center(map, fieldCenter, from); // from を中央に持っていく
         P fromCenter = make_pair(from.first - diffX, from.second);
-        VVI distCenter = calDist(fromCenter, to, fieldCenter);
-        VVI tmpCenter(height, VI(width, -1));
+        VVI distCenter = calDist(fromCenter, to, fieldCenter); // from を中央に持っていったときの最短経路図
+        VVI tmpCenter(height, VI(width, -1)); // from を元に戻したときの最短経路図
         P inverseCenter = make_pair(width - 1 - from.first, y);
         mapTranslation2Center(distCenter, tmpCenter, inverseCenter);
-        cerr << "tmpCenter: " << height << ' ' << width << endl;
-        REP(i, height) {
-            REP(j, width)
-                cerr << setw(2) << tmpCenter[i][j];
-            cerr << endl;
-        }
+        // cerr << "tmpCenter: " << height << ' ' << width << endl;
+        // cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
+        // REP(i, height) {
+        //     REP(j, width)
+        //         cerr << setw(2) << tmpCenter[i][j];
+        //     cerr << endl;
+        // }
     } else {
         VVI dist = calDist(from, to, map);
         REP(i, height) {
