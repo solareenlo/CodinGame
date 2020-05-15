@@ -25,6 +25,7 @@ constexpr double INF_INT = numeric_limits<int>::infinity();
 constexpr int DX[4] = {1, 0, -1, 0};
 constexpr int DY[4] = {0, 1, 0, -1};
 
+// 幅優先探索で from から map 状の経路を作成する
 inline VVI calDist(P from, P to, VVI map) {
     int height = map.size();
     int width = map[0].size();
@@ -60,6 +61,7 @@ inline VVI calDist(P from, P to, VVI map) {
     return dist;
 }
 
+// from のグリッド状の ori を右端か左端に持っていく
 inline void mapTranslation(VVI &from, VVI &to, P ori, char c) {
     int height = from.size();
     int width = from[0].size();
@@ -82,6 +84,30 @@ inline void mapTranslation(VVI &from, VVI &to, P ori, char c) {
     }
 }
 
+inline void mapUndoTranslation(VVI &from, VVI &to, P ori, char c ) {
+    int height = from.size();
+    int width = from[0].size();
+    // 右端を ori まで戻す
+    if (c == 'R') {
+        for (int j = 0; j < width - 1 - ori.first; j++)
+            REP(i, height)
+                to.at(i).at(j + ori.first + 1) = from.at(i).at(j);
+        for (int j = width - 1 - ori.first; j < width - 1; j++)
+            REP(i, height)
+                to.at(i).at(j - width + 1 + ori.first) = from.at(i).at(j);
+    }
+    // 左端を ori まで戻す
+    if (c == 'L') {
+        for (int j = 0; j < width - ori.first; j++)
+            REP(i, height)
+                to.at(i).at(j + ori.first) = from.at(i).at(j);
+        for (int j = width - ori.first; j < width; j++)
+            REP(i, height)
+                to.at(i).at(j - width + ori.first) = from.at(i).at(j);
+    }
+}
+
+// from のマップ状の ori を from の中心に持っていく
 inline void mapTranslation2Center(VVI &from, VVI &to, P ori) {
     int height = from.size();
     int width = from[0].size();
@@ -113,9 +139,9 @@ inline int calShortestDist(P from, P to, VVI map) {
     int height = map.size();
     int width = map[0].size();
     int diffX =  from.first - (width / 2);
-    VVI fieldCenter(height, VI(width, 0)); // from が中央に持っていく
-    VVI fieldLeft(height, VI(width, 0)); // from が左端に持っていく
-    VVI fieldRight(height, VI(width, 0)); // from を右端に持っていく
+    VVI fieldCenter(height, VI(width, 0)); // from が中央にある field
+    VVI fieldLeft(height, VI(width, 0)); // from が左端にある field
+    VVI fieldRight(height, VI(width, 0)); // from が右端にある field
     int x = 0, y = 0;
 
     bool loop = false;
@@ -123,22 +149,39 @@ inline int calShortestDist(P from, P to, VVI map) {
         if (map[i][0] == 1)
             loop = true;
     if (loop) {
-        mapTranslation(map, fieldRight, from, 'R');
+        mapTranslation(map, fieldRight, from, 'R'); // from を右端に持っていく
         P fromRight = make_pair(width - 1, from.second);
         VVI distRight = calDist(fromRight, to, fieldRight);
+        VVI tmpRight(height, VI(width, -1));
+        P inverseRight = make_pair(width - 1 - from.first, from.second);
+        P rightEdge = make_pair(width - 1, from.second);
+        mapUndoTranslation(distRight, tmpRight, from, 'R');
 
-        mapTranslation(map, fieldLeft, from, 'L');
+        mapTranslation(map, fieldLeft, from, 'L'); // from を左端に持っていく
         P fromLeft = make_pair(0, from.second);
         VVI distLeft = calDist(fromLeft, to, fieldLeft);
+        VVI tmpLeft(height, VI(width, -1));
+        mapUndoTranslation(distLeft, tmpLeft, from, 'L');
 
-        mapTranslation2Center(map, fieldCenter, from);
+        mapTranslation2Center(map, fieldCenter, from); // from を中央に持っていく
         P fromCenter = make_pair(from.first - diffX, from.second);
         VVI distCenter = calDist(fromCenter, to, fieldCenter);
-        VVI tmp(height, VI(width, -1));
-        P inverse = make_pair(width - 1 - from.first, y);
-        mapTranslation2Center(distCenter, tmp, inverse);
+        VVI tmpCenter(height, VI(width, -1));
+        P inverseCenter = make_pair(width - 1 - from.first, y);
+        mapTranslation2Center(distCenter, tmpCenter, inverseCenter);
+        cerr << "tmpCenter: " << height << ' ' << width << endl;
+        REP(i, height) {
+            REP(j, width)
+                cerr << setw(2) << tmpCenter[i][j];
+            cerr << endl;
+        }
     } else {
-        VVI sidt = calDist(from, to, map);
+        VVI dist = calDist(from, to, map);
+        REP(i, height) {
+            REP(j, width)
+                cerr << setw(2) << dist[i][j];
+            cerr << endl;
+        }
     }
     return 0;
 }
@@ -173,7 +216,6 @@ int main() {
     std::map<P, int> pellet;
     double time = static_cast<double>(chrono::duration_cast<chrono::microseconds>(end - start).count() / 1000.0);
     cerr << "time: " << time << endl;
-    // printf("time %lf[ms]\n", time);
     // game loop
     while (1) {
         int myScore;
