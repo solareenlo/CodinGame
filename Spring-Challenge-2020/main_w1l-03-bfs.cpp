@@ -173,28 +173,28 @@ inline int calShortestDist(P from, P to, VVI map) {
 
         REP(i, height) REP(j, width)
             dist.at(i).at(j) = min({tmpRight.at(i).at(j), tmpLeft.at(i).at(j), tmpCenter.at(i).at(j)});
-        cerr << "dist: " << height << ' ' << width << endl;
-        cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
-        REP(i, height) {
-            REP(j, width) {
-                if (dist[i][j] == 999)
-                    dist[i][j] = -1;
-                cerr << setw(2) << dist[i][j];
-            }
-            cerr << endl;
-        }
+        // cerr << "dist: " << height << ' ' << width << endl;
+        // cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
+        // REP(i, height) {
+        //     REP(j, width) {
+        //         if (dist[i][j] == 999)
+        //             dist[i][j] = -1;
+        //         cerr << setw(2) << dist[i][j];
+        //     }
+        //     cerr << endl;
+        // }
     } else {
         dist = calDist(from, to, map);
-        REP(i, height) {
-            REP(j, width) {
-                if (dist[i][j] == 999)
-                    dist[i][j] = -1;
-                cerr << setw(2) << dist[i][j];
-            }
-            cerr << endl;
-        }
+        // REP(i, height) {
+        //     REP(j, width) {
+        //         if (dist[i][j] == 999)
+        //             dist[i][j] = -1;
+        //         cerr << setw(2) << dist[i][j];
+        //     }
+        //     cerr << endl;
+        // }
     }
-    return 0;
+    return dist[to.second][to.first];
 }
 
 /**
@@ -260,15 +260,38 @@ int main() {
         }
 
         start = chrono::system_clock::now();
-        VP target;
         VP pellet10;
+        VP pellet1;
         for (auto itr = pellet.begin(); itr != pellet.end(); itr++) {
-            if (itr->second == 10) pellet10.push_back(itr->first);
+            if (itr->second == 10)
+                pellet10.push_back(itr->first);
+            if (itr->second == 1)
+                pellet1.push_back(itr->first);
         }
-        // for (auto itr = pellet10.begin(); itr != pellet10.end(); itr++) {
-        //     cerr << itr->first << ' ' << itr->second << endl;
-        // }
-        int tmp = calShortestDist(myPac[0], pellet.begin()->first, map);
+
+        std::map<int, P> target;
+        for (auto itr = myPac.begin(); itr != myPac.end(); itr++) {
+            int tmp = 1000;
+            if (pellet10.size()) {
+                for (auto itr2 = pellet10.begin(); itr2 != pellet10.end(); itr2++) {
+                    int dist = calShortestDist(*itr, *itr2, map);
+                    if (dist < tmp) {
+                        tmp = dist;
+                        target[distance(myPac.begin(), itr)] = *itr2;
+                    }
+                }
+            } else {
+                for (auto itr2 = pellet1.begin(); itr2 != pellet1.end(); itr2++) {
+                    int dist = calShortestDist(*itr, *itr2, map);
+                    if (dist < tmp) {
+                        tmp = dist;
+                        target[distance(myPac.begin(), itr)] = *itr2;
+                    }
+                }
+            }
+        }
+        // for (auto itr = target.begin(); itr != target.end(); itr++)
+        //     cerr << itr->first << " x: " << itr->second.first << " y: " << itr->second.second << endl;
         end = chrono::system_clock::now();
 
         // Write an action using cout. DON'T FORGET THE "<< endl"
