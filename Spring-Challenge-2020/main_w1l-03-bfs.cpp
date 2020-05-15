@@ -31,7 +31,7 @@ inline VVI calDist(P from, P to, VVI map) {
     int width = map[0].size();
 
     /* 幅優先探索の初期設定 */
-    VVI dist(height, VI(width, -1)); // 各セルの最短距離 (訪れていないところは -1 としておく)
+    VVI dist(height, VI(width, 999)); // 各セルの最短距離 (訪れていないところは 999 としておく)
     dist[from.second][from.first] = 0; // スタートを 0 に設定
     QP que; // 「一度見た頂点」のうち「まだ訪れていない頂点」を表すキュー
     que.push(make_pair(from.first, from.second)); // スタートを push
@@ -52,7 +52,7 @@ inline VVI calDist(P from, P to, VVI map) {
             if (map[nextY][nextX] == 0)
                 continue; // 壁はだめ
             // まだ見ていない頂点なら push
-            if (dist[nextY][nextX] == -1) {
+            if (dist[nextY][nextX] == 999) {
                 que.push(make_pair(nextX, nextY));
                 dist[nextY][nextX] = dist[y][x] + 1; // next の距離も更新
             }
@@ -144,59 +144,55 @@ inline int calShortestDist(P from, P to, VVI map) {
     VVI fieldCenter(height, VI(width, 0)); // from が中央にある field
     VVI fieldLeft(height, VI(width, 0)); // from が左端にある field
     VVI fieldRight(height, VI(width, 0)); // from が右端にある field
-    int x = 0, y = 0;
+    VVI dist(height, VI(width, 999)); // 各セルの最短距離 (訪れていないところは 999 としておく)
 
     bool loop = false;
     REP(i, height)
         if (map[i][0] == 1)
             loop = true;
+
     if (loop) {
         mapTranslation(map, fieldRight, from, 'R'); // from を右端に持っていく
         P fromRight = make_pair(width - 1, from.second);
         VVI distRight = calDist(fromRight, to, fieldRight); // from を右端に持っていったときの最短経路図
-        VVI tmpRight(height, VI(width, -1));// from を元に戻したときの最短経路図
+        VVI tmpRight(height, VI(width, 999));// from を元に戻したときの最短経路図
         P inverseRight = make_pair(width - 1 - from.first, from.second);
         P rightEdge = make_pair(width - 1, from.second);
         mapUndoTranslation(distRight, tmpRight, from, 'R');
-        cerr << "tmpRight: " << height << ' ' << width << endl;
-        cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
-        REP(i, height) {
-            REP(j, width)
-                cerr << setw(2) << tmpRight[i][j];
-            cerr << endl;
-        }
 
         mapTranslation(map, fieldLeft, from, 'L'); // from を左端に持っていく
         P fromLeft = make_pair(0, from.second);
         VVI distLeft = calDist(fromLeft, to, fieldLeft); // from を左端に持っていったときの最短経路図
-        VVI tmpLeft(height, VI(width, -1)); // from を元に戻したときの最短経路図
+        VVI tmpLeft(height, VI(width, 999)); // from を元に戻したときの最短経路図
         mapUndoTranslation(distLeft, tmpLeft, from, 'L');
-        cerr << "tmpLeft: " << height << ' ' << width << endl;
-        cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
-        REP(i, height) {
-            REP(j, width)
-                cerr << setw(2) << tmpLeft[i][j];
-            cerr << endl;
-        }
 
         mapTranslation2Center(map, fieldCenter, from); // from を中央に持っていく
         P fromCenter = make_pair(from.first - diffX, from.second);
         VVI distCenter = calDist(fromCenter, to, fieldCenter); // from を中央に持っていったときの最短経路図
-        VVI tmpCenter(height, VI(width, -1)); // from を元に戻したときの最短経路図
-        P inverseCenter = make_pair(width - 1 - from.first, y);
+        VVI tmpCenter(height, VI(width, 999)); // from を元に戻したときの最短経路図
+        P inverseCenter = make_pair(width - 1 - from.first, from.second);
         mapTranslation2Center(distCenter, tmpCenter, inverseCenter);
-        cerr << "tmpCenter: " << height << ' ' << width << endl;
+
+        REP(i, height) REP(j, width)
+            dist.at(i).at(j) = min({tmpRight.at(i).at(j), tmpLeft.at(i).at(j), tmpCenter.at(i).at(j)});
+        cerr << "dist: " << height << ' ' << width << endl;
         cerr << "ori: " << "y: " << from.second << " x: " << from.first << endl;
         REP(i, height) {
-            REP(j, width)
-                cerr << setw(2) << tmpCenter[i][j];
+            REP(j, width) {
+                if (dist[i][j] == 999)
+                    dist[i][j] = -1;
+                cerr << setw(2) << dist[i][j];
+            }
             cerr << endl;
         }
     } else {
-        VVI dist = calDist(from, to, map);
+        dist = calDist(from, to, map);
         REP(i, height) {
-            REP(j, width)
+            REP(j, width) {
+                if (dist[i][j] == 999)
+                    dist[i][j] = -1;
                 cerr << setw(2) << dist[i][j];
+            }
             cerr << endl;
         }
     }
