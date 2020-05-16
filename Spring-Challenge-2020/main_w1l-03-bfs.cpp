@@ -216,6 +216,10 @@ int main() {
         }
     }
 
+    VVI mapCopy(height, VI(width, 0));
+    REP(i, height) REP(j, width)
+        mapCopy[i][j] = map[i][j];
+
     // 床の枚数を数える
     int countFloor = 0;
     REP(i, height) REP(j, width) {
@@ -229,6 +233,9 @@ int main() {
     cerr << "time: " << time << endl;
     // game loop
     while (1) {
+        REP(i, height) REP(j, width)
+            map[i][j] = mapCopy[i][j];
+
         int myScore;
         int opponentScore;
         cin >> myScore >> opponentScore; cin.ignore();
@@ -288,6 +295,7 @@ int main() {
                         target[distance(myPac.begin(), itr)] = *itr2;
                     }
                 }
+                map[target[distance(myPac.begin(), itr)].second][target[distance(myPac.begin(), itr)].first] = 0;
             }
         }
         // for (auto itr = target.begin(); itr != target.end(); itr++)
@@ -300,7 +308,7 @@ int main() {
         REP(i, myPac.size()) {
             cout << "MOVE" << ' ' << i << ' ' << target[i].first << ' ' << target[i].second; // MOVE <pacId> <x> <y>
             if (i == myPac.size() - 1) cout << endl;
-            else cout << " | ";
+            else cout << "|";
         }
     }
 }
