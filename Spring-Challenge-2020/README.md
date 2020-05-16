@@ -13,7 +13,14 @@
 | 全ての2点間を求める        | ワーシャル-フロイド法 | O(V^3)                           |
 
 ## References
+### ゲーム木探索
+- [ゲーム木探索技術とコンピュータ将棋への応用](https://www.slideshare.net/shogotakeuchi/ss-62415546)
+- [5分で覚えるAI Minimax（ミニマックス）法とalpha-beta法](https://www.webcyou.com/?p=6997)
+- [強化学習入門 Part3 － AlphaGoZeroでも重要な技術要素！ モンテカルロ木探索の入門 －](https://blog.brainpad.co.jp/entry/2018/04/05/163000)
+- [モンテカルロで二人ゲーム](http://ustimaw.hatenablog.com/entry/2014/12/14/081423)
 - [競技プログラミングにおけるゲーム木探索の面白さ](https://qiita.com/tsukammo/items/02e8ad2469c5441d2956)
+
+### 幅優先探索
 - [幅優先探索(Breadth First Search)の基本](https://algo-logic.info/bfs/)
 - [最短経路問題総特集！！！～BFSから拡張ダイクストラまで～](https://qiita.com/ageprocpp/items/cdf67e828e1b09316f6e)
 - [最短経路問題の解法まとめ](https://qiita.com/ta-ka/items/a023a11efe17ab097433)
