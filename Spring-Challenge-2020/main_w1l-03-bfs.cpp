@@ -21,7 +21,7 @@ using QP = queue<P>;
 using VI = vector<int>;
 using VVI = vector<vector<int> >;
 constexpr double INF_DOUBLE = numeric_limits<double>::infinity();
-constexpr double INF_INT = numeric_limits<int>::infinity();
+constexpr int INF_INT = numeric_limits<int>::infinity();
 constexpr int DX[4] = {1, 0, -1, 0};
 constexpr int DY[4] = {0, 1, 0, -1};
 
